@@ -5,8 +5,10 @@ const { getUsuarios ,
         deleteUsuarios , 
         patchUsuarios } = require('../controllers/usuarios');
 
-const router = Router();
+const router = Router(); //Se instancia la clase Router la cual ayudará con el enrutamiento hacia las rutas del controlador
 
+
+//Se definen las rutas para cada método
 router.get('/', getUsuarios)
 
 router.put('/:id', putUsuarios)

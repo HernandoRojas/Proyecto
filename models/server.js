@@ -1,5 +1,6 @@
 const express = require('express'); // se importa express
 const cors = require('cors');
+const { dbConnection } = require('../database/config');
 
 class Server{
     //Se crea la clase servidor
@@ -9,6 +10,9 @@ class Server{
         this.port = process.env.PORT; //Se define el puerto en el que corre el servidor por medio de la variable puerto que viene de la variable global en el archivo .env
         this.usuariosPath = '/api/usuarios';
 
+        //Conectar a base de datos
+        this.conectarBD();
+
         //Middlewares
         this.middlewares();
 
@@ -17,6 +21,10 @@ class Server{
 
         //Rutas de la aplicación
         this.routes();
+    }
+
+    async conectarBD(){
+        await dbConnection();
     }
 
     middlewares(){
