@@ -1,4 +1,7 @@
 const { response, request } = require('express');
+const Usuario = require('../models/usuario');
+const bcryptjs = require('bcryptjs');
+const errors = require('../middlewares/validaciones');
 
 //Función para enviar datos cuando se ejecuta un GET desde el front
 const getUsuarios = (req = request, res = response) => {
@@ -27,16 +30,33 @@ const putUsuarios = (req, res = response) => {
 }
 
 //Función para enviar datos cuando se ejecuta un POST desde el front
-const postUsuarios = (req, res = response) => {
+const postUsuarios = async (req, res = response) => {
 
     // se obtienen los parámetros que fueron enviados desde la url de la petición POST en el front
-    const { nombre, edad} = req.body;
+    const {nombre, apellido, nickname, clave, rol, imagen} = req.body;
+    const usuario = new Usuario({nombre, apellido, nickname, clave, rol, imagen}); // Se instancia el usuairo al momento de la creación del mismo
+
+    //Se verifica si el nickname existe
+    const validarNick = await Usuario.findOne({nickname})
+    if (validarNick){
+        return res.status(400).json(
+            {
+                msg : "El nickname ya existe"
+            }
+        ); //Con la palabra return basta para que el controlador se detenga y no se continue ejecutando el método post
+    }
+
+    // Se encripta contraseña
+    const salt = bcryptjs.genSaltSync();
+    usuario.clave = bcryptjs.hashSync(clave, salt)
+
+    //Guardar usuario
+    await usuario.save(); // se guardan los datos en la base de datos creandose el documento(registro) en la base de datos en la colección (Tabla) de usuarios 
 
     //se envia respuesta en formato JSON
     res.json({
         msg: 'Post API - Controlador',
-        nombre,
-        edad
+        nombre, apellido, nickname, clave, rol, imagen
     });
     //res.json(body) // para mostrar solo el body tal como viene
 }
